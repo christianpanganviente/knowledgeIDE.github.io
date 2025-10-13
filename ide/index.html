@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge IDE | IDE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="../css/ide.css"/>
+    <script src="../js/ide.js"></script>
+</head>
+<body class="bg-blackish text-gray-200">
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-10 hidden lg:hidden"></div>
+    
+    <header class="w-full bg-sidebar-bg h-10 flex items-center justify-between px-3 fixed top-0 z-50 border-b border-[#333]">
+        <div class="text-xs font-semibold flex items-center space-x-2">
+            <span class="text-white font-bold text-sm">Knowledge IDE</span>
+            <div class="relative group header-menu-item">
+                <button class="text-gray-400 hover:text-white px-2">File</button>
+                <div class="absolute top-full left-0 bg-panel-bg border border-[#333] rounded-md shadow-lg w-40 p-1 hidden group-hover:block z-10">
+                    <button id="menu-new-file" class="w-full text-left px-3 py-1.5 hover:bg-code-bg rounded-sm">New File</button>
+                    <button id="menu-new-folder" class="w-full text-left px-3 py-1.5 hover:bg-code-bg rounded-sm">New Folder</button>
+                </div>
+            </div>
+            <button id="header-save-btn" class="text-gray-400 hover:text-white px-2 header-menu-item">Download</button>
+            <button id="header-run-btn" class="text-gray-400 hover:text-white px-2 header-menu-item">Run</button>
+        </div>
+        <div class="flex items-center space-x-3">
+            <div id="save-notification" class="text-gray-400 opacity-0 text-xs">Saved to Local!</div>
+            <button id="sidebar-toggle-mobile" class="lg:hidden text-gray-300 hover:text-primary transition text-lg">
+                <i class="fas fa-bars"></i>
+            </button>
+            <button id="run-button" class="cta-button bg-primary hover:bg-primary-hover text-blackish font-semibold text-xs py-1.5 px-3 rounded shadow transition transform hover:scale-[1.05]">
+                <i class="fas fa-play mr-1"></i>
+                <span class="hidden sm:inline">Run</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="ide-container">
+        <div class="activity-bar bg-blackish text-gray-400 flex flex-col items-center py-4 border-r border-[#333] flex-shrink-0 z-30">
+            <button class="w-full py-3 hover:text-primary transition active-icon" title="Explorer" data-view="explorer">
+                <i class="fas fa-file-code"></i>
+            </button>
+            <button class="w-full py-3 hover:text-primary transition" title="Search" data-view="search">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="w-full py-3 hover:text-primary transition" title="Debug" data-view="debug">
+                <i class="fas fa-bug"></i>
+            </button>
+            <button class="w-full py-3 hover:text-primary transition" title="Settings" data-view="settings">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+
+        <div class="main-content-wrapper flex flex-1 min-w-0">
+            <div id="sidebar-panel" class="sidebar bg-sidebar-bg flex-shrink-0 border-r border-[#333] lg:flex flex-col">
+                <div id="explorer-view" class="sidebar-view flex-1 flex flex-col min-h-0">
+                    <div class="p-3 border-b border-[#333] flex justify-between items-center flex-shrink-0">
+                        <span class="text-sm font-semibold text-gray-300">EXPLORER</span>
+                        <div class="text-gray-400">
+                            <button id="new-file-btn" class="hover:text-primary transition" title="New File"><i class="fas fa-file-plus"></i></button>
+                            <button id="new-folder-btn" class="ml-2 hover:text-primary transition" title="New Folder"><i class="fas fa-folder-plus"></i></button>
+                        </div>
+                    </div>
+                    <div id="file-explorer-container" class="flex-1 overflow-y-auto custom-scrollbar p-2"></div>
+                </div>
+
+                <div id="search-view" class="sidebar-view hidden p-3 flex-col min-h-0">
+                    <span class="text-sm font-semibold text-gray-300">SEARCH IN FILES</span>
+                    <input type="text" id="search-input" placeholder="Search code..." class="w-full bg-code-bg border border-[#333] rounded px-2 py-1 mt-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                    <div id="search-results" class="mt-2 overflow-y-auto custom-scrollbar flex-1"></div>
+                </div>
+
+                <div id="debug-view" class="sidebar-view hidden p-3">
+                    <span class="text-sm font-semibold text-gray-300">DEBUG</span>
+                    <p class="text-xs text-gray-500 mt-2">No debug configurations.</p>
+                </div>
+
+                <div id="settings-view" class="sidebar-view hidden p-3">
+                    <span class="text-sm font-semibold text-gray-300">SETTINGS</span>
+                    <div class="mt-4">
+                        <label for="theme-selector" class="text-xs font-bold text-gray-400">Theme</label>
+                        <select id="theme-selector" class="w-full bg-code-bg border border-[#333] rounded px-2 py-1 mt-1 text-sm">
+                            <option value="knowledgeDark">Knowledge Dark</option>
+                            <option value="vs">VS Light</option>
+                        </select>
+                    </div>
+                    <div class="mt-4 flex items-center">
+                        <input type="checkbox" id="auto-run-checkbox" class="h-4 w-4 bg-gray-700 border-gray-600 text-primary focus:ring-primary">
+                        <label for="auto-run-checkbox" class="ml-2 text-sm text-gray-300">Auto-run preview on change</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-view flex flex-col flex-1 min-w-0">
+                <div id="tab-bar" class="tab-bar h-9 bg-panel-bg border-b border-[#333] flex items-center px-2 flex-shrink-0 overflow-x-auto custom-scrollbar"> </div>
+                
+                <div id="editor-panel-wrapper" class="flex flex-col flex-1 min-h-0" style="min-height: 200px;"> 
+                    <div class="editor-container-wrapper flex-1 bg-code-bg min-h-0" id="editor-area"> 
+                        <div id="editor-container" class="h-full"></div>
+                        <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-gray-500 p-4 text-center">
+                            <i class="fas fa-code text-6xl mb-4"></i>
+                            <h2 class="text-2xl font-semibold text-gray-300">Welcome to Knowledge IDE</h2>
+                            <p class="mt-2">Select a file to start coding or create a new one.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="resize-handle-y" class="w-full h-1 bg-gray-600 hover:bg-primary cursor-row-resize flex-shrink-0"></div>
+
+                    <div class="bottom-panel bg-panel-bg border-t border-[#333] flex flex-col flex-shrink-0" id="bottom-panel-area"> 
+                        <div class="panel-tabs h-8 flex items-center border-b border-[#333] px-3">
+                            <button class="panel-tab-btn text-xs font-bold h-full px-3 pt-1 active-panel-tab" data-panel="console">CONSOLE</button>
+                            <button class="panel-tab-btn text-xs font-bold text-gray-400 hover:text-white h-full px-3 pt-1 ml-2" data-panel="preview">PREVIEW</button>
+                        </div>
+                        <div id="console-panel" class="bottom-panel-content flex-1 overflow-y-auto font-mono text-sm p-3 custom-scrollbar min-h-0">
+                            <div class="text-gray-500 italic mb-1">Execution Profiling is active. Run code with the <span class="text-primary font-semibold">Run</span> button.</div>
+                        </div>
+                        <div id="preview-panel" class="bottom-panel-content hidden flex-1 bg-white min-h-0">
+                            <iframe id="preview-iframe" class="w-full h-full border-0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer" class="bg-[#0d0d0d] py-1 px-4 h-6 text-gray-400 text-xs flex justify-between items-center fixed bottom-0 w-full z-50 border-t border-[#333]">
+        <div><i class="fas fa-code-branch mr-2 text-secondary"></i>main*</div>
+        <div class="space-x-4">
+            <span id="cursor-position">Ln 1, Col 1</span>
+            <span id="language-status" class="text-white font-semibold">JavaScript</span>
+        </div>
+    </footer>
+</body>
+</html>
