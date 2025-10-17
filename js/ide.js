@@ -50,7 +50,7 @@ require(['vs/editor/editor.main', 'jszip'], function(_, JSZip) {
             { id: 'folder-1', name: 'src', type: 'folder', children: [
                 { id: '1', name: 'script.js', type: 'file', language: 'javascript', content: `// Welcome to Knowledge IDE! 🚀\nconsole.log("Hello, World!");\nconsole.warn("This is a warning.");\nconsole.error({ message: "An error object!" });\ndocument.body.querySelector('h1').style.color = 'orange';` },
                 { id: '2', name: 'index.html', type: 'file', language: 'html', content: `<!DOCTYPE html>\n<html>\n  <head>\n    <link rel="stylesheet" href="style.css">\n    <title>My App</title>\n  </head>\n  <body>\n    <h1>Hello from HTML!</h1>\n    <script src="script.js"></script>\n  </body>\n</html>` },
-                { id: '3', name: 'style.css', type: 'file', language: 'css', content: `body {\n  background-color: #f0f0f0;\n  font-family: sans-serif;\n  color: #333;\n}` },
+                { id: '3', name: 'style.css', type: 'file', language: 'css', content: `body {\n background-color: #f0f0f0;\n font-family: sans-serif;\n color: #333;\n}` },
             ], isOpen: true },
         ],
         openFiles: [],
