@@ -3,40 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Knowledge IDE | IDE</title>
+    <title>Knowledge IDE | Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="../css/ide.css"/>
-    <script src="../js/ide.js"></script>
-</head>
+    </head>
 <body class="bg-blackish text-gray-200">
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-10 hidden lg:hidden"></div>
     
-    <header class="w-full bg-sidebar-bg h-10 flex items-center justify-between px-3 fixed top-0 z-50 border-b border-[#333]">
-        <div class="text-xs font-semibold flex items-center space-x-2">
-            <span class="text-white font-bold text-sm">Knowledge IDE</span>
-            <div class="relative group header-menu-item">
-                <button class="text-gray-400 hover:text-white px-2">File</button>
-                <div class="absolute top-full left-0 bg-panel-bg border border-[#333] rounded-md shadow-lg w-40 p-1 hidden group-hover:block z-10">
-                    <button id="menu-new-file" class="w-full text-left px-3 py-1.5 hover:bg-code-bg rounded-sm">New File</button>
-                    <button id="menu-new-folder" class="w-full text-left px-3 py-1.5 hover:bg-code-bg rounded-sm">New Folder</button>
-                </div>
+<header class="w-full bg-sidebar-bg h-10 flex items-center justify-between px-3 fixed top-0 z-50 border-b border-[#333]">
+    <div class="text-xs font-semibold flex items-center space-x-2">
+        <span class="text-white font-bold text-sm">Knowledge IDE</span>
+        <div class="relative group"> 
+            <button class="text-gray-400 hover:text-white px-2">
+                <span class="hidden lg:inline">File</span>
+                <i class="fas fa-folder-open lg:hidden"></i>
+            </button>
+            <div class="absolute top-full left-0 bg-panel-bg border border-[#333] rounded-md shadow-lg w-40 p-1 hidden group-hover:block z-10">
+                <button id="menu-new-file" class="w-full text-left px-3 py-1.5 hover:bg-code-bg rounded-sm">New File</button>
+                <button id="menu-new-folder" class="w-full text-left px-3 py-1.5 hover:bg-code-bg rounded-sm">New Folder</button>
             </div>
-            <button id="header-save-btn" class="text-gray-400 hover:text-white px-2 header-menu-item">Download</button>
-            <button id="header-run-btn" class="text-gray-400 hover:text-white px-2 header-menu-item">Run</button>
         </div>
-        <div class="flex items-center space-x-3">
-            <div id="save-notification" class="text-gray-400 opacity-0 text-xs">Saved to Local!</div>
-            <button id="sidebar-toggle-mobile" class="lg:hidden text-gray-300 hover:text-primary transition text-lg">
-                <i class="fas fa-bars"></i>
-            </button>
-            <button id="run-button" class="cta-button bg-primary hover:bg-primary-hover text-blackish font-semibold text-xs py-1.5 px-3 rounded shadow transition transform hover:scale-[1.05]">
-                <i class="fas fa-play mr-1"></i>
-                <span class="hidden sm:inline">Run</span>
-            </button>
-        </div>
-    </header>
+        <button id="header-save-btn" class="text-gray-400 hover:text-white px-2" title="Download">
+            <span class="hidden lg:inline">Download</span><i class="fas fa-download lg:hidden"></i> 
+        </button>
+        <button id="header-run-btn" class="text-gray-400 hover:text-white px-2" title="Run">
+            <span class="hidden lg:inline">Run</span><i class="fas fa-play lg:hidden"></i>
+        </button>
+    </div>
+    <div class="flex items-center space-x-3">
+        <div id="save-notification" class="text-gray-400 opacity-0 text-xs hidden sm:block">Saved to Local!</div> 
+        <button id="sidebar-toggle-mobile" class="lg:hidden text-gray-300 hover:text-primary transition text-lg">
+            <i class="fas fa-bars"></i>
+        </button>
+<button id="run-button" class="cta-button bg-primary hover:bg-primary-hover text-blackish font-semibold text-xs py-1.5 px-3 rounded shadow transition transform hover:scale-[1.05] flex items-center">
+    <i class="fas fa-play mr-1 sm:mr-1"></i> 
+    <span class="hidden sm:inline">Run</span>
+</button>
+    </div>
+</header>
 
     <main class="ide-container">
         <div class="activity-bar bg-blackish text-gray-400 flex flex-col items-center py-4 border-r border-[#333] flex-shrink-0 z-30">
@@ -95,11 +101,15 @@
             </div>
 
             <div class="editor-view flex flex-col flex-1 min-w-0">
-                <div id="tab-bar" class="tab-bar h-9 bg-panel-bg border-b border-[#333] flex items-center px-2 flex-shrink-0 overflow-x-auto custom-scrollbar"> </div>
+                <div id="tab-bar" class="tab-bar h-9 bg-panel-bg border-b border-[#333] flex items-center px-2 flex-shrink-0 overflow-x-auto custom-scrollbar">
+                <button id="split-editor-btn" class="ml-2 text-gray-400 hover:text-primary transition px-2" title="Split Editor">
+                    <i class="fas fa-columns"></i>
+                </button>
+            </div>
                 
-                <div id="editor-panel-wrapper" class="flex flex-col flex-1 min-h-0" style="min-height: 200px;"> 
+                <div id="editor-panel-wrapper" class="flex flex-col flex-1 min-h-0"> 
                     <div class="editor-container-wrapper flex-1 bg-code-bg min-h-0" id="editor-area"> 
-                        <div id="editor-container" class="h-full"></div>
+                        <div id="editor-container" class="h-full" style="width:100%;height:100%;min-height:300px;"></div>
                         <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-gray-500 p-4 text-center">
                             <i class="fas fa-code text-6xl mb-4"></i>
                             <h2 class="text-2xl font-semibold text-gray-300">Welcome to Knowledge IDE</h2>
@@ -122,6 +132,20 @@
                         </div>
                     </div>
                 </div>
+                 <div id="mobile-view-tabs" class="h-12 bg-sidebar-bg border-t border-[#333] flex lg:hidden justify-around items-center flex-shrink-0">
+                    <button class="mobile-tab-btn active-panel-tab flex-1 h-full flex flex-col items-center justify-center" data-page="editor">
+                        <i class="fas fa-code"></i>
+                        <span class="text-xs mt-1">Editor</span>
+                    </button>
+                    <button class="mobile-tab-btn text-gray-400 hover:text-white flex-1 h-full flex flex-col items-center justify-center" data-page="console">
+                        <i class="fas fa-terminal"></i>
+                        <span class="text-xs mt-1">Console</span>
+                    </button>
+                    <button class="mobile-tab-btn text-gray-400 hover:text-white flex-1 h-full flex flex-col items-center justify-center" data-page="preview">
+                        <i class="fas fa-eye"></i>
+                        <span class="text-xs mt-1">Preview</span>
+                    </button>
+                </div>
             </div>
         </div>
     </main>
@@ -131,7 +155,14 @@
         <div class="space-x-4">
             <span id="cursor-position">Ln 1, Col 1</span>
             <span id="language-status" class="text-white font-semibold">JavaScript</span>
+            <span id="encoding-status">UTF-8</span>
+            <span id="indent-status">Spaces: 4</span>
         </div>
     </footer>
+    <script src="../js/ide.js"></script> 
+    <div id="command-palette" class="fixed top-16 left-1/2 transform -translate-x-1/2 w-96 bg-panel-bg border border-[#333] rounded shadow-lg z-50 hidden">
+    <input id="command-input" type="text" class="w-full bg-code-bg text-white px-4 py-2 border-b border-[#333] outline-none" placeholder="Type a command...">
+    <div id="command-list" class="max-h-64 overflow-y-auto"></div>
+</div>
 </body>
 </html>
