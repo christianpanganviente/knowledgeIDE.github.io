@@ -21,6 +21,8 @@ let editor;
 const functionTimers = {};
 let autoRunTimeout;
 let splitEditor = null;
+let lastActivityBarClick = { view: null, time: 0 };
+let lastLog = { message: null, type: null, element: null, count: 1 };
 
 require.config({
     paths: {
@@ -48,7 +50,7 @@ require(['vs/editor/editor.main', 'jszip'], function(_, JSZip) {
     let state = {
         fileTree: [
             { id: 'folder-1', name: 'src', type: 'folder', children: [
-                { id: '1', name: 'script.js', type: 'file', language: 'javascript', content: `// Welcome to Knowledge IDE! 🚀\nconsole.log("Hello, World!");\nconsole.warn("This is a warning.");\nconsole.error({ message: "An error object!" });\ndocument.body.querySelector('h1').style.color = 'orange';` },
+                { id: '1', name: 'script.js', type: 'file', language: 'javascript', content: `// Welcome to Knowledge IDE! 🚀\nconsole.log("Hello, World!");\nconsole.log("Hello, World!");\nconsole.warn("This is a warning.");\nconsole.error({ message: "An error object!" });\ndocument.body.querySelector('h1').style.color = 'orange';` },
                 { id: '2', name: 'index.html', type: 'file', language: 'html', content: `<!DOCTYPE html>\n<html>\n  <head>\n    <link rel="stylesheet" href="style.css">\n    <title>My App</title>\n  </head>\n  <body>\n    <h1>Hello from HTML!</h1>\n    <script src="script.js"></script>\n  </body>\n</html>` },
                 { id: '3', name: 'style.css', type: 'file', language: 'css', content: `body {\n background-color: #f0f0f0;\n font-family: sans-serif;\n color: #333;\n}` },
             ], isOpen: true },
@@ -408,8 +410,21 @@ require(['vs/editor/editor.main', 'jszip'], function(_, JSZip) {
     };
 
     const logToConsole = (type, message) => {
+        if (message === lastLog.message && type === lastLog.type && lastLog.element) {
+            lastLog.count++;
+            let countEl = lastLog.element.querySelector('.log-count');
+            if (!countEl) {
+                countEl = document.createElement('span');
+                countEl.className = 'log-count text-gray-400 font-bold mr-2 w-8 text-right flex-shrink-0';
+                lastLog.element.prepend(countEl);
+            }
+            countEl.textContent = `(x${lastLog.count})`;
+            elements.consolePanel.scrollTop = elements.consolePanel.scrollHeight;
+            return;
+        }
+
         const logEntry = document.createElement('div');
-        logEntry.className = `p-1 border-b border-panel-bg text-sm font-mono whitespace-pre-wrap`;
+        logEntry.className = 'log-entry p-1 border-b border-panel-bg text-sm font-mono whitespace-pre-wrap flex items-start';
 
         let iconClass = '';
         let textClass = 'text-gray-200';
@@ -421,13 +436,26 @@ require(['vs/editor/editor.main', 'jszip'], function(_, JSZip) {
             default: iconClass = 'text-gray-400 fas fa-info-circle';
         }
 
-        logEntry.innerHTML = `<span class="mr-2 ${iconClass}"></span><span class="${textClass}">${message}</span>`;
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        logEntry.innerHTML = `
+            <span class="log-count w-8 mr-2 flex-shrink-0"></span>
+            <span class="timestamp text-gray-500 w-20 flex-shrink-0">${timestamp}</span>
+            <span class="log-content flex-grow flex items-start">
+                <span class="mr-2 ${iconClass}"></span>
+                <span class="${textClass}">${message}</span>
+            </span>
+        `;
+        
         elements.consolePanel.appendChild(logEntry);
         elements.consolePanel.scrollTop = elements.consolePanel.scrollHeight;
+
+        lastLog = { message, type, element: logEntry, count: 1 };
     };
 
     const clearConsole = () => {
         elements.consolePanel.innerHTML = '<div class="text-gray-500 italic mb-1">Execution Profiling is active. Run code with the <span class="text-primary font-semibold">Run</span> button.</div>';
+        lastLog = { message: null, type: null, element: null, count: 1 };
     };
 
     const setupConsoleRedirection = () => {
@@ -698,12 +726,25 @@ require(['vs/editor/editor.main', 'jszip'], function(_, JSZip) {
             const button = e.target.closest('button');
             if (!button) return;
             const view = button.dataset.view;
+            const currentTime = Date.now();
+        
+            if (view === lastActivityBarClick.view && (currentTime - lastActivityBarClick.time < 500) && elements.sidebar.classList.contains('active')) {
+                toggleSidebar(false);
+                lastActivityBarClick = { view: null, time: 0 }; 
+                return;
+            }
+        
             elements.activityBarButtons.forEach(b => b.classList.remove('active-icon'));
             button.classList.add('active-icon');
             elements.sidebarViews.forEach(v => v.classList.add('hidden'));
             document.getElementById(`${view}-view`).classList.remove('hidden');
             state.settings.activeSidebarView = view;
-            if(window.innerWidth < 1024) toggleSidebar(true);
+            
+            if (!elements.sidebar.classList.contains('active')) {
+                toggleSidebar(true);
+            }
+        
+            lastActivityBarClick = { view, time: currentTime };
         });
 
         document.querySelector('.panel-tabs').addEventListener('click', e => {

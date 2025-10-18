@@ -29,7 +29,7 @@
             <span class="hidden lg:inline">Download</span><i class="fas fa-download lg:hidden"></i> 
         </button>
         <button id="header-run-btn" class="text-gray-400 hover:text-white px-2" title="Run">
-            <span class="hidden lg:inline">Run</span><i class="fas fa-play lg:hidden"></i>
+            <span class="hidden lg:inline">Run</span><i class="fas fa-play text-green-500 lg:hidden"></i>
         </button>
     </div>
     <div class="flex items-center space-x-3">
@@ -37,7 +37,7 @@
         <button id="sidebar-toggle-mobile" class="lg:hidden text-gray-300 hover:text-primary transition text-lg">
             <i class="fas fa-bars"></i>
         </button>
-<button id="run-button" class="cta-button bg-primary hover:bg-primary-hover text-blackish font-semibold text-xs py-1.5 px-3 rounded shadow transition transform hover:scale-[1.05] flex items-center">
+<button id="run-button" class="hidden lg:flex cta-button bg-primary hover:bg-primary-hover text-blackish font-semibold text-xs py-1.5 px-3 rounded shadow transition transform hover:scale-[1.05] items-center">
     <i class="fas fa-play mr-1 sm:mr-1"></i> 
     <span class="hidden sm:inline">Run</span>
 </button>
@@ -66,7 +66,8 @@
                     <div class="p-3 border-b border-[#333] flex justify-between items-center flex-shrink-0">
                         <span class="text-sm font-semibold text-gray-300">EXPLORER</span>
                         <div class="text-gray-400">
-                            <button id="new-file-btn" class="hover:text-primary transition" title="New File"><i class="fas fa-file-plus"></i></button>
+                            <!-- Changed: Added "add file" icon to the left of the folder icon -->
+                            <button id="new-file-btn" class="hover:text-primary transition" title="New File"><i class="fas fa-plus-square"></i></button>
                             <button id="new-folder-btn" class="ml-2 hover:text-primary transition" title="New Folder"><i class="fas fa-folder-plus"></i></button>
                         </div>
                     </div>
